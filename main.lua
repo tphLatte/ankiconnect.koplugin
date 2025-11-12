@@ -1,4 +1,5 @@
 local Dispatcher = require("dispatcher") -- luacheck:ignore
+local json = require("rapidjson")
 local AnkiConnect = require("AnkiConnect")
 local KeyValuePage = require("ui/widget/keyvaluepage")
 local InfoMessage = require("ui/widget/infomessage")
@@ -21,15 +22,37 @@ local myAnki = WidgetContainer:extend({
     name = "anki_rev",
 })
 
-function myAnki:deckView(deckinfo)
+function myAnki:deckView(deckinfo, id)
+    local deck = deckinfo[id]
+    local name = deck.name
+    local new_v = deck.new_count
+    local learn_v = deck.learn_count
+    local review_v = deck.review_count
     return MultiConfirmBox:new({
-        text = _("Set %1 as fallback font?"),
+        text = _(
+            name
+                .. " \n "
+                .. "New Cards: "
+                .. new_v
+                .. "\n"
+                .. "To Relearn: "
+                .. learn_v
+                .. "\n"
+                .. "To Review: "
+                .. review_v
+                .. "\n"
+        ),
         choice1_text = _("Study"),
         choice1_callback = function()
             -- set as default font
         end,
-        choice2_text = _("Fallback"),
+        choice2_text = _("Options"),
         choice2_callback = function()
+            -- set as fallback font
+        end,
+
+        choice3_text = _("Deck Statistics"),
+        choice3_callback = function()
             -- set as fallback font
         end,
     })
@@ -49,18 +72,21 @@ end
 local function get_decks()
     local decks = AnkiConnect.get_decks()
     local sub_item_table = {}
-    for i = 1, #decks do
+    for k, v in pairs(decks) do
         local to_insert = ""
-        to_insert = decks[i]
+        to_insert = k
         table.insert(sub_item_table, {
             to_insert,
             "",
             callback = function()
+                io.write("WARN id is", v)
+                io.write("WARN calling stats from", to_insert, "\n")
                 local stats = AnkiConnect:get_stats_from(to_insert)
-                UIManager:show(myAnki:deckView(stats))
-                UIManager:show(InfoMessage:new({
-                    text = _("Deck is" .. to_insert),
-                }))
+                io.write("WARN statsTYpe ", type(stats))
+                UIManager:show(myAnki:deckView(stats, tostring(v)))
+                --UIManager:show(InfoMessage:new({
+                --    text = _("Deck is" .. to_insert .. " and " .. v),
+                --}))
             end,
         })
     end
