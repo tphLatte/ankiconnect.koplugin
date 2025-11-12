@@ -6,6 +6,8 @@ local HtmlBoxWidget = require("ui/widget/htmlboxwidget")
 local ViewHtml = require("ui.viewhtml")
 local UIManager = require("ui/uimanager")
 local WidgetContainer = require("ui/widget/container/widgetcontainer")
+local ButtonDialog = require("ui/widget/buttondialog")
+local MultiConfirmBox = require("ui/widget/multiconfirmbox")
 local _ = require("gettext")
 
 -- Enforce line-buffering for stdout (this is the default if it points to a tty, but we redirect to a file on most platforms).
@@ -18,6 +20,20 @@ io.write([[ WARN myAnki[*] Current time: ]], os.date("%x-%X"), "\n")
 local myAnki = WidgetContainer:extend({
     name = "anki_rev",
 })
+
+function myAnki:deckView(deckinfo)
+    return MultiConfirmBox:new({
+        text = _("Set %1 as fallback font?"),
+        choice1_text = _("Study"),
+        choice1_callback = function()
+            -- set as default font
+        end,
+        choice2_text = _("Fallback"),
+        choice2_callback = function()
+            -- set as fallback font
+        end,
+    })
+end
 
 function myAnki:KeyValuePage(title, messageTable)
     local kv = KeyValuePage:new({
@@ -40,6 +56,8 @@ local function get_decks()
             to_insert,
             "",
             callback = function()
+                local stats = AnkiConnect:get_stats_from(to_insert)
+                UIManager:show(myAnki:deckView(stats))
                 UIManager:show(InfoMessage:new({
                     text = _("Deck is" .. to_insert),
                 }))
