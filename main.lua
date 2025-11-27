@@ -68,9 +68,9 @@ function myAnki:show_card(card_info, question_answer, on_done)
     UIManager:show(self.card_menu)
 end
 
-function myAnki:deckView(deckinfo, id)
+function myAnki:deckView(deckinfo, deck_name, id)
     local deck = deckinfo[id]
-    local name = deck.name
+    local name = deck_name
     local new_v = deck.new_count
     local learn_v = deck.learn_count
     local review_v = deck.review_count
@@ -94,7 +94,9 @@ function myAnki:deckView(deckinfo, id)
             local function show_next_card()
                 local card = deck_iter()
                 if not card then
-                    print("Deck finished")
+                    UIManager:show(InfoMessage:new({
+                        text = _("Deck finished"),
+                    }))
                     return
                 end
 
@@ -148,7 +150,7 @@ local function get_decks()
                 -- io.write("WARN calling stats from", to_insert, "\n")
                 local stats = AnkiConnect:get_stats_from(to_insert)
                 -- io.write("WARN statsTYpe ", type(stats))
-                UIManager:show(myAnki:deckView(stats, tostring(v)))
+                UIManager:show(myAnki:deckView(stats, k, tostring(v)))
                 --UIManager:show(InfoMessage:new({
                 --    text = _("Deck is" .. to_insert .. " and " .. v),
                 --}))

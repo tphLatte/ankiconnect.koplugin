@@ -8,7 +8,9 @@ os.setlocale("C", "numeric")
 
 local AnkiConnect = {}
 
-local endpoint = "http://192.168.100.109:8765"
+local endpoint = "http://localhost:8765"
+--"http://148.201.238:8765"
+-- "http://192.168.100.109:8765"
 function AnkiConnect:init()
     self.endpoint = endpoint
 end
@@ -45,15 +47,16 @@ function AnkiConnect:get_stats_from(deck)
 end
 
 function AnkiConnect:query_from_deck(deck)
-    local query = '"deck:' .. deck .. '"'
+    local query = '"deck:\\"' .. deck .. '\\""'
     local action = [[
     {"action": "findCards",
     "version": 6,
     "params": {
-        "query":]] .. query .. [[
+        "query": ]] .. query .. [[
         }
     }
     ]]
+    io.write("WARN stats : curl localhost:8765 -X POST -d ' ", action, "' \n")
 
     local body, code, headers, status = http.request(endpoint, action)
     return json.decode(body).result
@@ -70,13 +73,11 @@ function AnkiConnect:read_card_from_id(card_id)
     }]]
 
     local body, code, headers, status = http.request(endpoint, action)
-    -- io.write("WARN card_info", body)
+    io.write("WARN card_info", body)
     return json.decode(body).result
 end
 
 local card_ids = AnkiConnect:query_from_deck("Vocabulary")
 --print(card_ids)
-local card_info = AnkiConnect:read_card_from_id(card_ids[1])
-print(card_info)
 
 return AnkiConnect
