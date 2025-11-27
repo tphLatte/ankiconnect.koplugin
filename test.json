@@ -1,0 +1,86 @@
+{
+  "result": [
+    {
+      "cardId": 1587207907361,
+      "fields": {
+        "Word": {
+          "value": "Characteristic",
+          "order": 0
+        },
+        "Phonetic": {
+          "value": "/ˌker(ə)ktəˈristik/",
+          "order": 1
+        },
+        "Definition1": {
+          "value": "A feature or quality belonging typically to a person, place, or thing and serving to identify it.",
+          "order": 2
+        },
+        "Example1": {
+          "value": "\"Inherited characteristics such as blood groups.\"",
+          "order": 3
+        },
+        "Synonyms1": {
+          "value": "Attribute, feature.",
+          "order": 4
+        },
+        "Definition2": {
+          "value": "The whole number or integral part of a logarithm, which gives the order of magnitude of the original number.",
+          "order": 5
+        },
+        "Example2": {
+          "value": "\"His early work was on quadratic forms in fields, particularly fields of characteristic 2.\"",
+          "order": 6
+        },
+        "Synonyms2": {
+          "value": "",
+          "order": 7
+        },
+        "Definition3": {
+          "value": "",
+          "order": 8
+        },
+        "Example3": {
+          "value": "",
+          "order": 9
+        },
+        "Synonyms3": {
+          "value": "",
+          "order": 10
+        },
+        "Audio": {
+          "value": "[sound:AUDIO-Characteristic.mp3]",
+          "order": 11
+        },
+        "ExampleSource": {
+          "value": "",
+          "order": 12
+        }
+      },
+      "fieldOrder": 2,
+      "question": "<style>.card {\n font-family: arial;\n text-align: left;\n color: black;\n background-color: white;\n}\n</style><b><font size=\"8px\"> Characteristic:</b> </font size>\n<br><b><font size=\"5px\"> <font color= \"#2F4F4F\">\"His early work was on quadratic forms in fields, particularly fields of characteristic 2.\"</font color></font size>",
+      "answer": "<style>.card {\n font-family: arial;\n text-align: left;\n color: black;\n background-color: white;\n}\n</style><b><font size=\"8px\"> Characteristic</b> </font size>\n<br>\n<i><font size=\"3px\">/ˌker(ə)ktəˈristik/</font size></i>   [anki:play:a:0]\n\n<hr id=answer>\n\n<b><font size=5px\">\n1. A feature or quality belonging typically to a person, place, or thing and serving to identify it.\n<br>\n</font size>\n<font size=3px\"><font color= \"#2F4F4F\"> \"Inherited characteristics such as blood groups.\" </font color></font size>\n<br>\n<i><font color= \"#C0C0C0\"><font size=\"2px\"> Synonyms : Attribute, feature. </font size></i></font color>\n<br><b><font size=5px\">\n2. The whole number or integral part of a logarithm, which gives the order of magnitude of the original number.\n<br>\n</font size>\n<font size=3px\"><font color= \"#2F4F4F\">\"His early work was on quadratic forms in fields, particularly fields of characteristic 2.\"</font color></font size>\n<br>\n<i><font color= \"#C0C0C0\"><font size=\"2px\">  </font size></i></font color>\n<br>\n<b><font size=5px\">\n\n<br>\n</font size>\n<font size=3px\"><font color= \"#2F4F4F\"> </font color></font size>\n<br>\n<i><font color= \"#C0C0C0\"><font size=\"2px\">  </font size></i></font color>",
+      "modelName": "Vocabulary-8962d",
+      "ord": 2,
+      "deckName": "Vocabulary",
+      "css": ".card {\n font-family: arial;\n text-align: left;\n color: black;\n background-color: white;\n}\n",
+      "factor": 0,
+      "interval": 0,
+      "note": 1587207899722,
+      "type": 0,
+      "queue": 0,
+      "due": 193,
+      "reps": 0,
+      "lapses": 0,
+      "left": 0,
+      "mod": 1743449956,
+      "nextReviews": [
+        "<⁨1⁩m",
+        "<⁨6⁩m",
+        "⁨10⁩m",
+        "⁨21⁩j"
+      ],
+      "flags": 0
+    }
+  ],
+  "error": null
+}

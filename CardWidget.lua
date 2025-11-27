@@ -74,44 +74,19 @@ function CardWidget:init()
     local larger_span_units = 3 -- 3 x small span width
     local nb_span_units = 2 + 2 * larger_span_units
     local btn_width = math.floor(((inner_width + frame_padding) - nb_span_units * button_span_unit_width) * (1 / 6))
+    self.btn_width = btn_width
 
-    -- create some helper functions
-    local update = function(opts)
-        self:update_context()
-    end
-    local prev_c_inc = function(inc)
-        update({ prev_c = self.prev_c_cnt + inc })
-    end
-    local next_c_inc = function(inc)
-        update({ next_c = self.next_c_cnt + inc })
-    end
-    -- char counter is reset to 0 when sentence count is changed
-    local prev_s_inc = function(inc)
-        update({ prev_c = 0, prev_s = self.prev_s_cnt + inc })
-    end
-    local next_s_inc = function(inc)
-        update({ next_c = 0, next_s = self.next_s_cnt + inc })
-    end
-
-    local eval_again = make_button("again", btn_width, function() end)
-    local eval_hard = make_button("hard", btn_width, function() end)
-    local eval_good = make_button("good", btn_width, function() end)
-    local eval_easy = make_button("easy", btn_width, function() end)
-
-    local reset_prev = make_button("Reset", btn_width * 2, function()
-        self:reset_prev()
-        return self:update_context()
+    local eval_again = make_button("again", btn_width, function()
+        self:onClose()
     end)
-
-    local append_next_char = make_button("1+", btn_width, function()
-        next_c_inc(1)
+    local eval_hard = make_button("hard", btn_width, function()
+        self:onClose()
     end)
-    local append_next_sentence = make_button("⏩", btn_width, function()
-        next_s_inc(1)
+    local eval_good = make_button("good", btn_width, function()
+        self:onClose()
     end)
-    local reset_next = make_button("Reset", btn_width * 2, function()
-        self:reset_next()
-        self:update_context()
+    local eval_easy = make_button("easy", btn_width, function()
+        self:onClose()
     end)
 
     self.top_row = HorizontalGroup:new({
@@ -128,10 +103,10 @@ function CardWidget:init()
 
     self.confirm_row = HorizontalGroup:new({
         align = "center",
-        make_button("Exit", btn_width * 2, function()
+        make_button("Exit", self.btn_width * 2, function()
             self:onClose()
         end),
-        make_button("Show Answer", btn_width * 4, self.on_save_cb),
+        make_button("Show Answer", self.btn_width * 4, self.on_show_answer),
     })
 
     self.context_menu = FrameContainer:new({
@@ -152,6 +127,7 @@ function CardWidget:init()
     self.movable = MovableContainer:new({
         self.context_menu,
     })
+
     self[1] = WidgetContainer:new({
         align = "center",
         dimen = Geom:new({
@@ -164,6 +140,10 @@ function CardWidget:init()
         self.confirm_row,
     })
     self:update_context()
+end
+
+function CardWidget:onShowAnswer()
+    UIManager:close(self)
 end
 
 function CardWidget:onClose()
@@ -195,6 +175,17 @@ function CardWidget:reset() end
 function CardWidget:update_context()
     local css = self.note.css
     local context = self.note.question
+    if self.mode == "answer" then
+        context = self.note.answer
+    else
+        self.confirm_row = HorizontalGroup:new({
+            align = "center",
+            make_button("Exit", self.btn_width * 2, function()
+                self:onClose()
+            end),
+            make_button("Show Answer", self.btn_width * 4, self.on_show_answer),
+        })
+    end
     io.write("WARN card_context:", context)
 
     self[1]:free()

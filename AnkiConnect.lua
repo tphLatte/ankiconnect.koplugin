@@ -8,9 +8,13 @@ os.setlocale("C", "numeric")
 
 local AnkiConnect = {}
 
+local endpoint = "http://192.168.100.109:8765"
+function AnkiConnect:init()
+    self.endpoint = endpoint
+end
+
 function AnkiConnect:get_decks()
-    local body, code, headers, status =
-        http.request("http://localhost:8765", '{"action": "deckNamesAndIds", "version": 6}')
+    local body, code, headers, status = http.request(endpoint, '{"action": "deckNamesAndIds", "version": 6}')
     return json.decode(body).result
 end
 
@@ -19,26 +23,60 @@ function AnkiConnect:get_stats(decks)
     for i = 1, #decks do
         deck_names = deck_names .. decks[i]
     end
-    local body, code, headers, status = http.request(
-        "http://localhost:8765",
-        '{ "action": "getDeckStats", "version": 6, "params":{ "decks"=[' .. "]} }"
-    )
-    io.write("WARN DECK", body)
+    local body, code, headers, status =
+        http.request(endpoint, '{ "action": "getDeckStats", "version": 6, "params":{ "decks"=[' .. "]} }")
+    -- io.write("WARN DECK", body)
     return json.decode(body).result
 end
 
 function AnkiConnect:get_deck_id(deck_name)
     local action = '{ "action": "deckNamesAndIds", "version": 6 }'
-    local body, code, headers, status = http.request("http://localhost:8765", action)
+    local body, code, headers, status = http.request(endpoint, action)
     return json.decode(body).result[deck_name]
 end
 
 function AnkiConnect:get_stats_from(deck)
     local deck_names = '"' .. deck .. '"'
     local action = '{ "action": "getDeckStats", "version": 6, "params":{ "decks":[' .. deck_names .. "]} }"
-    local body, code, headers, status = http.request("http://localhost:8765", action)
+    local body, code, headers, status = http.request(endpoint, action)
 
-    io.write("WARN DECK", body)
+    -- io.write("WARN stats ", body)
     return json.decode(body).result
 end
+
+function AnkiConnect:query_from_deck(deck)
+    local query = '"deck:' .. deck .. '"'
+    local action = [[
+    {"action": "findCards",
+    "version": 6,
+    "params": {
+        "query":]] .. query .. [[
+        }
+    }
+    ]]
+
+    local body, code, headers, status = http.request(endpoint, action)
+    return json.decode(body).result
+end
+
+function AnkiConnect:read_card_from_id(card_id)
+    local cards = card_id
+    local action = [[{
+        "action": "cardsInfo",
+        "version": 6,
+        "params": {
+            "cards": []] .. cards .. [[ ]
+        }
+    }]]
+
+    local body, code, headers, status = http.request(endpoint, action)
+    -- io.write("WARN card_info", body)
+    return json.decode(body).result
+end
+
+local card_ids = AnkiConnect:query_from_deck("Vocabulary")
+--print(card_ids)
+local card_info = AnkiConnect:read_card_from_id(card_ids[1])
+print(card_info)
+
 return AnkiConnect
