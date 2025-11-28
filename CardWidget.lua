@@ -61,6 +61,7 @@ function CardWidget:init()
     local frame_height = math.floor(math.min(screen_width, screen_height) * 0.50)
     local frame_border_size = Size.border.window
     local frame_padding = Size.padding.fullscreen
+    frame_padding = 0
     local inner_width = frame_width - 2 * (frame_border_size + frame_padding)
     local inner_height = frame_height - 2 * (frame_border_size + frame_padding)
 
@@ -77,16 +78,20 @@ function CardWidget:init()
     self.btn_width = btn_width
 
     local eval_again = make_button("again", btn_width, function()
-        self:onClose()
+        self.review(self.note.cardId, 1)
+        self.on_show_answer()
     end)
     local eval_hard = make_button("hard", btn_width, function()
-        self:onClose()
+        self.review(self.note.cardId, 2)
+        self.on_show_answer()
     end)
     local eval_good = make_button("good", btn_width, function()
-        self:onClose()
+        self.review(self.note.cardId, 3)
+        self.on_show_answer()
     end)
     local eval_easy = make_button("easy", btn_width, function()
-        self:onClose()
+        self.review(self.note.cardId, 4)
+        self.on_show_answer()
     end)
 
     self.top_row = HorizontalGroup:new({
@@ -186,7 +191,6 @@ function CardWidget:update_context()
             make_button("Show Answer", self.btn_width * 4, self.on_show_answer),
         })
     end
-    io.write("WARN card_context:", context)
 
     self[1]:free()
     self.scroll_widget.htmlbox_widget:setContent(context, css, Screen:scaleBySize(self.font_size))

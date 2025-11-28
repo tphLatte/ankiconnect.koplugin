@@ -62,6 +62,29 @@ function AnkiConnect:query_from_deck(deck)
     return json.decode(body).result
 end
 
+function AnkiConnect:review_card(card_id, ease)
+    local action = [[
+    {
+        "action": "answerCards",
+        "version": 6,
+        "params": {
+            "answers": [
+                {
+                    "cardId": ]] .. card_id .. ' ,"ease": ' .. ease .. [[
+                }
+            ]
+        }
+    }
+
+    ]]
+    io.write("WARN review, ", action, "\n")
+
+    local body, code, headers, status = http.request(endpoint, action)
+    io.write("WARN card_response, ", body, "\n")
+
+    return json.decode(body).result
+end
+
 function AnkiConnect:read_card_from_id(card_id)
     local cards = card_id
     local action = [[{
@@ -73,7 +96,6 @@ function AnkiConnect:read_card_from_id(card_id)
     }]]
 
     local body, code, headers, status = http.request(endpoint, action)
-    io.write("WARN card_info", body)
     return json.decode(body).result
 end
 

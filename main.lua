@@ -47,6 +47,9 @@ end
 
 function myAnki:show_card(card_info, question_answer, on_done)
     local signal = question_answer
+    local function review_card(card_id, ease)
+        AnkiConnect:review_card(card_id, ease)
+    end
     local function on_save_cb()
         local m = self.card_menu
         -- self.current_note:set_custom_context(m.prev_s_cnt, m.prev_c_cnt, m.next_s_cnt, m.next_c_cnt)
@@ -64,6 +67,7 @@ function myAnki:show_card(card_info, question_answer, on_done)
         mode = signal,
         on_save_cb = on_save_cb, -- called when saving note with updated context
         on_show_answer = on_show_next,
+        review = review_card,
     })
     UIManager:show(self.card_menu)
 end
