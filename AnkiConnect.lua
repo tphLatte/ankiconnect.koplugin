@@ -99,7 +99,4 @@ function AnkiConnect:read_card_from_id(card_id)
     return json.decode(body).result
 end
 
-local card_ids = AnkiConnect:query_from_deck("Vocabulary")
---print(card_ids)
-
 return AnkiConnect
