@@ -17,6 +17,9 @@ end
 
 function AnkiConnect:get_decks()
     local body, code, headers, status = http.request(endpoint, '{"action": "deckNamesAndIds", "version": 6}')
+    if body == nil then
+        error()
+    end
     return json.decode(body).result
 end
 
@@ -41,7 +44,10 @@ function AnkiConnect:get_stats_from(deck)
     local deck_names = '"' .. deck .. '"'
     local action = '{ "action": "getDeckStats", "version": 6, "params":{ "decks":[' .. deck_names .. "]} }"
     local body, code, headers, status = http.request(endpoint, action)
-    io.write("WARN ", status, code)
+    if body == nil then
+        error()
+    end
+    io.write("WARN ", code)
     return json.decode(body).result
 end
 

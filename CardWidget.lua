@@ -62,7 +62,7 @@ function CardWidget:init()
 
     local row_span = VerticalSpan:new({ width = Size.padding.fullscreen })
     local frame_width = math.floor(math.min(screen_width, screen_height) * 0.85)
-    local frame_height = math.floor(math.min(screen_width, screen_height) * 0.50)
+    local frame_height = math.floor(math.min(screen_width, screen_height) * 0.80)
     local frame_border_size = Size.border.window
     local frame_padding = Size.padding.fullscreen
     frame_padding = 0
@@ -103,8 +103,9 @@ function CardWidget:init()
         align = "center",
     })
 
+    self.bottom_row = HorizontalGroup:new({ align = "center" })
     if self.mode ~= "question" then
-        self.bottom_row = HorizontalGroup:new({
+        self.confirm_row = HorizontalGroup:new({
             align = "center",
             eval_again,
             eval_hard,
@@ -112,16 +113,14 @@ function CardWidget:init()
             eval_easy,
         })
     else
-        self.bottom_row = HorizontalGroup:new({ align = "center" })
+        self.confirm_row = HorizontalGroup:new({
+            align = "center",
+            make_button("Exit", self.btn_width * 2, function()
+                self:onClose()
+            end),
+            make_button("Show Answer", self.btn_width * 4, self.on_show_answer),
+        })
     end
-
-    self.confirm_row = HorizontalGroup:new({
-        align = "center",
-        make_button("Exit", self.btn_width * 2, function()
-            self:onClose()
-        end),
-        make_button("Show Answer", self.btn_width * 4, self.on_show_answer),
-    })
 
     self.context_menu = FrameContainer:new({
         margin = 0,
