@@ -145,7 +145,7 @@ end
 local function get_decks()
     local decks = {}
     xpcall(function()
-        decks = AnkiConnect.get_decks()
+        decks = AnkiConnect:get_decks()
     end, catch_write)
     local sub_item_table = {}
 
