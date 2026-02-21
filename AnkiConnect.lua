@@ -8,7 +8,7 @@ os.setlocale("C", "numeric")
 
 local AnkiConnect = {}
 
-local endpoint = "http://localhost:8765"
+local endpoint = "http://192.148.100.109:8765"
 --"http://148.201.238:8765"
 -- "http://192.168.100.109:8765"
 function AnkiConnect:init()
