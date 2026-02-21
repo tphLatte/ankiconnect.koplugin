@@ -72,8 +72,7 @@ function myAnki:show_card(card_info, question_answer, on_done)
     UIManager:show(self.card_menu)
 end
 
-function myAnki:deckView(deckinfo, deck_name, id)
-    local deck = deckinfo[id]
+function myAnki:deckView(deck, deck_name)
     local name = deck_name
     local new_v = deck.new_count
     local learn_v = deck.learn_count
@@ -149,6 +148,7 @@ local function get_decks()
         decks = AnkiConnect.get_decks()
     end, catch_write)
     local sub_item_table = {}
+
     for k, v in pairs(decks) do
         local to_insert = ""
         to_insert = k
@@ -160,14 +160,14 @@ local function get_decks()
                 -- io.write("WARN calling stats from", to_insert, "\n")
                 local stats = AnkiConnect:get_stats_from(to_insert)
                 -- io.write("WARN statsTYpe ", type(stats))
-                UIManager:show(myAnki:deckView(stats, k, tostring(v)))
+                local deck = stats[tostring(v)]
+                UIManager:show(myAnki:deckView(deck, k))
                 --UIManager:show(InfoMessage:new({
                 --    text = _("Deck is" .. to_insert .. " and " .. v),
                 --}))
             end,
         })
     end
-
     return myAnki:KeyValuePage("Decks", sub_item_table)
 end
 
