@@ -16,6 +16,10 @@ local WidgetContainer = require("ui/widget/container/widgetcontainer")
 local Screen = Device.screen
 -- local config = require("anki_configuration")
 
+io.stdout:setvbuf("line")
+-- Enforce a reliable locale for numerical representations
+os.setlocale("C", "numeric")
+
 local CardWidget = FocusManager:extend({})
 
 local function make_button(text, width, cb, enabled_func)
@@ -71,6 +75,7 @@ function CardWidget:init()
         height = inner_height,
         dialog = self,
     })
+
     local button_span_unit_width = Size.span.horizontal_small
     local larger_span_units = 3 -- 3 x small span width
     local nb_span_units = 2 + 2 * larger_span_units
@@ -98,13 +103,17 @@ function CardWidget:init()
         align = "center",
     })
 
-    self.bottom_row = HorizontalGroup:new({
-        align = "center",
-        eval_again,
-        eval_hard,
-        eval_good,
-        eval_easy,
-    })
+    if self.mode ~= "question" then
+        self.bottom_row = HorizontalGroup:new({
+            align = "center",
+            eval_again,
+            eval_hard,
+            eval_good,
+            eval_easy,
+        })
+    else
+        self.bottom_row = HorizontalGroup:new({ align = "center" })
+    end
 
     self.confirm_row = HorizontalGroup:new({
         align = "center",
@@ -182,6 +191,7 @@ function CardWidget:update_context()
     local context = self.note.question
     if self.mode == "answer" then
         context = self.note.answer
+        io.write("WARN context is answer!!! ", context, "\n")
     else
         self.confirm_row = HorizontalGroup:new({
             align = "center",

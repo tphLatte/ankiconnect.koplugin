@@ -41,8 +41,7 @@ function AnkiConnect:get_stats_from(deck)
     local deck_names = '"' .. deck .. '"'
     local action = '{ "action": "getDeckStats", "version": 6, "params":{ "decks":[' .. deck_names .. "]} }"
     local body, code, headers, status = http.request(endpoint, action)
-
-    -- io.write("WARN stats ", body)
+    io.write("WARN ", status, code)
     return json.decode(body).result
 end
 
@@ -80,7 +79,7 @@ function AnkiConnect:review_card(card_id, ease)
     io.write("WARN review, ", action, "\n")
 
     local body, code, headers, status = http.request(endpoint, action)
-    io.write("WARN card_response, ", body, "\n")
+    -- io.write("WARN card_response, ", body, "\n")
 
     return json.decode(body).result
 end
