@@ -139,9 +139,15 @@ function myAnki:KeyValuePage(title, messageTable)
     })
     UIManager:show(kv)
 end
+local function catch_write(e)
+    print("ERROR:", e)
+end
 
 local function get_decks()
-    local decks = AnkiConnect.get_decks()
+    local decks = {}
+    xpcall(function()
+        decks = AnkiConnect.get_decks()
+    end, catch_write)
     local sub_item_table = {}
     for k, v in pairs(decks) do
         local to_insert = ""

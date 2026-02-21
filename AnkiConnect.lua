@@ -8,7 +8,7 @@ os.setlocale("C", "numeric")
 
 local AnkiConnect = {}
 
-local endpoint = "http://192.148.100.109:8765"
+local endpoint = "http://192.168.100.109:8765"
 --"http://148.201.238:8765"
 -- "http://192.168.100.109:8765"
 function AnkiConnect:init()
@@ -17,9 +17,10 @@ end
 
 function AnkiConnect:get_decks()
     local body, code, headers, status = http.request(endpoint, '{"action": "deckNamesAndIds", "version": 6}')
-    if body == nil then
-        error()
-    end
+    assert(body ~= nil, "did not get deck response")
+    io.write("WARN")
+    io.write(code, "\n")
+    io.write(body, "\n")
     return json.decode(body).result
 end
 
@@ -30,6 +31,8 @@ function AnkiConnect:get_stats(decks)
     end
     local body, code, headers, status =
         http.request(endpoint, '{ "action": "getDeckStats", "version": 6, "params":{ "decks"=[' .. "]} }")
+
+    assert(body ~= nil, "Did not get deck info")
     -- io.write("WARN DECK", body)
     return json.decode(body).result
 end
