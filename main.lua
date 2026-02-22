@@ -142,32 +142,94 @@ local function catch_write(e)
     print("ERROR:", e)
 end
 
-local function get_decks()
-    local decks = {}
+local function deck_load_helper()
+    local decks = AnkiConnect:get_decks()
+    local result = {}
+
     xpcall(function()
         decks = AnkiConnect:get_decks()
     end, catch_write)
-    local sub_item_table = {}
 
-    for k, v in pairs(decks) do
-        local to_insert = ""
-        to_insert = k
-        table.insert(sub_item_table, {
-            to_insert,
-            "",
+    for name, id in pairs(decks) do
+        result[name] = {
+            text = name,
+            name,
             callback = function()
-                -- io.write("WARN id is", v)
-                -- io.write("WARN calling stats from", to_insert, "\n")
-                local stats = AnkiConnect:get_stats_from(to_insert)
-                -- io.write("WARN statsTYpe ", type(stats))
-                local deck = stats[tostring(v)]
-                UIManager:show(myAnki:deckView(deck, k))
-                --UIManager:show(InfoMessage:new({
-                --    text = _("Deck is" .. to_insert .. " and " .. v),
-                --}))
+                local stats = AnkiConnect:get_stats_from(name)
+                local deck = stats[tostring(id)]
+                UIManager:show(myAnki:deckView(deck, name))
             end,
+        }
+    end
+
+    return result
+end
+
+local function build_tree(tbl)
+    local result = {}
+
+    for key, value in pairs(tbl) do
+        local node = result
+        for part in (key .. "::"):gmatch("(.-)::") do
+            node[part] = node[part] or {}
+            node = node[part]
+        end
+        node.current = value
+    end
+
+    return result
+end
+
+function myAnki:open_group_page(title, node)
+    local items = {}
+
+    if type(node) ~= "table" then
+        return
+    end
+
+    -- open deck entry
+    if node.current and node.current.callback then
+        table.insert(items, {
+            _("Open deck"),
+            "",
+            callback = node.current.callback,
         })
     end
+
+    for k, v in pairs(node) do
+        if k ~= "current" and type(v) == "table" then
+            table.insert(items, {
+                k,
+                "",
+                callback = function()
+                    self:open_group_page(k, v)
+                end,
+            })
+        end
+    end
+
+    UIManager:show(KeyValuePage:new({
+        title = title,
+        kv_pairs = items,
+    }))
+end
+
+local function get_grouped_decks()
+    local decks = deck_load_helper()
+    local tree = build_tree(decks)
+    myAnki:open_group_page("Decks", tree)
+end
+
+local function get_decks()
+    local decks = {}
+    local sub_item_table = {}
+
+    sub_item_table = {}
+    decks = deck_load_helper()
+    for k, v in pairs(decks) do
+        table.insert(sub_item_table, v)
+    end
+
     return myAnki:KeyValuePage("Decks", sub_item_table)
 end
 
@@ -193,7 +255,7 @@ function myAnki:get_sub_menu_items()
             text = _("Grouped Decks"),
             keep_menu_open = true,
             sub_item_table_func = function()
-                return get_decks()
+                return get_grouped_decks()
             end,
         },
 
