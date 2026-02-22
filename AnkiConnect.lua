@@ -24,6 +24,15 @@ function AnkiConnect:get_decks()
     return json.decode(body).result
 end
 
+function AnkiConnect:sync()
+    local body, code, headers, status = http.request(endpoint, '{"action": "sync", "version": 6}')
+    assert(body ~= nil, "did not get sync response")
+    io.write("WARN")
+    io.write(code, "\n")
+    io.write(body, "\n")
+    return json.decode(body).result
+end
+
 function AnkiConnect:get_stats(decks)
     local deck_names = ""
     for i = 1, #decks do

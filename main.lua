@@ -188,6 +188,14 @@ function myAnki:get_sub_menu_items()
                 return get_decks()
             end,
         },
+
+        {
+            text = _("Synchronize data"),
+            keep_menu_open = true,
+            sub_item_table_func = function()
+                return AnkiConnect:sync()
+            end,
+        },
     }
     return sub_item_table
 end
