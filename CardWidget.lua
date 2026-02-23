@@ -61,8 +61,8 @@ function CardWidget:init()
     end
 
     local row_span = VerticalSpan:new({ width = Size.padding.fullscreen })
-    local frame_width = math.floor(math.min(screen_width, screen_height) * 0.95)
-    local frame_height = math.floor(math.min(screen_width, screen_height) * 0.95)
+    local frame_width = math.floor(math.min(screen_width, screen_height) - 5)
+    local frame_height = math.floor(math.min(screen_width, screen_height) - 5)
     local frame_border_size = Size.border.window
     local frame_padding = Size.padding.fullscreen
     frame_padding = 0
