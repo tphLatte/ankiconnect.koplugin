@@ -2,6 +2,7 @@ local Dispatcher = require("dispatcher") -- luacheck:ignore
 local Size = require("ui/size")
 local json = require("rapidjson")
 local Device = require("device")
+local NetworkMgr = require("ui/network/manager")
 local Screen = Device.screen
 local AnkiConnect = require("AnkiConnect")
 local CardWidget = require("CardWidget") -- luacheck:ignore
@@ -255,12 +256,22 @@ function myAnki:get_sub_menu_items()
             text = _("Grouped Decks"),
             keep_menu_open = true,
             sub_item_table_func = function()
-                return get_grouped_decks()
+                return NetworkMgr:runWhenOnline(function()
+                    return get_grouped_decks()
+                end)
             end,
         },
 
         {
             text = _("Synchronize data"),
+            keep_menu_open = true,
+            callback = function()
+                return AnkiConnect:sync()
+            end,
+        },
+
+        {
+            text = _("Set Anki Endpoint"),
             keep_menu_open = true,
             callback = function()
                 return AnkiConnect:sync()
