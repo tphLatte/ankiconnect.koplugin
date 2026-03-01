@@ -46,6 +46,20 @@ function myAnki:deck_cards_iterator(deck)
     end
 end
 
+function myAnki:deck_cards_iterator2(deck)
+    local card_ids = myAnki:get_cards(deck)
+    local cards = myAnki:read_cards(card_ids)
+    local i = 0
+    local n = #card_ids
+    return function()
+        i = i + 1
+        if i <= n then
+            local card_id = card_ids[i]
+            return cards[card_id]
+        end
+    end
+end
+
 function myAnki:show_card(card_info, question_answer, on_done)
     local signal = question_answer
     local function review_card(card_id, ease)
@@ -94,7 +108,7 @@ function myAnki:deckView(deck, deck_name)
         ),
         choice1_text = _("Study"),
         choice1_callback = function()
-            local deck_iter = myAnki:deck_cards_iterator(name)
+            local deck_iter = myAnki:deck_cards_iterator2(name)
             local function show_next_card()
                 local card = deck_iter()
                 if not card then
