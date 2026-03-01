@@ -248,7 +248,9 @@ function myAnki:get_sub_menu_items()
             text = _("Select Decks"),
             keep_menu_open = true,
             sub_item_table_func = function()
-                return get_decks()
+                return NetworkMgr:runWhenOnline(function()
+                    return get_decks()
+                end)
             end,
         },
 
@@ -266,7 +268,9 @@ function myAnki:get_sub_menu_items()
             text = _("Synchronize data"),
             keep_menu_open = true,
             callback = function()
-                return AnkiConnect:sync()
+                return NetworkMgr:runWhenOnline(function()
+                    return AnkiConnect:sync()
+                end)
             end,
         },
 
