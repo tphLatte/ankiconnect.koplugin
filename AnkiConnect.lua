@@ -5,6 +5,7 @@ local json = require("rapidjson")
 local ssl = require("ssl") -- LuaSec
 local ltn12 = require("ltn12")
 local forvo = require("forvo")
+local logger = require("logger")
 
 io.stdout:setvbuf("line")
 -- Enforce a reliable locale for numerical representations
@@ -51,11 +52,13 @@ function AnkiConnect:POST(opts)
         sink = ltn12.sink.table(sink),
         source = ltn12.source.string(payload),
     }
-    -- logger.dbg("AnkiConnect#POST request:", req)
+
+    logger.dbg("AnkiConnect#POST request:", req)
     local status_code, response_headers, status = self.with_timeout(1, function()
         return socket.skip(1, http.request(req))
     end)
     -- logger.dbg("AnkiConnect#POST response:", status_code, response_headers, status)
+    io.write("WARN POST RESP", status_code, response_headers, status, "\n")
 
     if type(status_code) == "string" then
         return nil, status_code
@@ -165,16 +168,8 @@ function AnkiConnect:read_card_from_id(card_id)
 end
 
 function AnkiConnect:read_cards(cards)
-    local action = [[{
-        "action": "cardsInfo",
-        "version": 6,
-        "params": {
-            "cards": []] .. cards .. [[ ]
-        }
-    }]]
-
-    local body, code, headers, status = http.request(endpoint, action)
-    return json.decode(body).result
+    local anki_connect_request = { action = "cardsInfo", params = { cards = cards }, version = 6 }
+    return self:POST({ payload = anki_connect_request, url = endpoint })
 end
 
 return AnkiConnect

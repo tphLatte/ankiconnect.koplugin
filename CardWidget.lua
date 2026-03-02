@@ -1,5 +1,6 @@
 local Blitbuffer = require("ffi/blitbuffer")
 local Button = require("ui/widget/button")
+local logger = require("logger")
 local Device = require("device")
 local FrameContainer = require("ui/widget/container/framecontainer")
 local FocusManager = require("ui/widget/focusmanager")
@@ -186,6 +187,7 @@ end
 function CardWidget:reset() end
 
 function CardWidget:update_context()
+    logger.dbg("NOTE IS ", self.note)
     local css = self.note.css
     local context = self.note.question
     if self.mode == "answer" then
