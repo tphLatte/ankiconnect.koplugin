@@ -57,8 +57,7 @@ function AnkiConnect:POST(opts)
     local status_code, response_headers, status = self.with_timeout(1, function()
         return socket.skip(1, http.request(req))
     end)
-    -- logger.dbg("AnkiConnect#POST response:", status_code, response_headers, status)
-    io.write("WARN POST RESP", status_code, response_headers, status, "\n")
+    logger.dbg("AnkiConnect#POST response:", status_code, response_headers, status)
 
     if type(status_code) == "string" then
         return nil, status_code
