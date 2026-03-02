@@ -1,4 +1,5 @@
 local Dispatcher = require("dispatcher") -- luacheck:ignore
+local logger = require("logger")
 local Size = require("ui/size")
 local json = require("rapidjson")
 local Device = require("device")
@@ -48,19 +49,23 @@ end
 
 function myAnki:deck_cards_iterator2(deck)
     local card_ids = myAnki:get_cards(deck)
-    local cards = myAnki:read_cards(card_ids)
+    local cards = AnkiConnect:read_cards(card_ids)
     local i = 0
     local n = #card_ids
+
+    io.write("WARN deck_len, ", n, "\n")
     return function()
         i = i + 1
         if i <= n then
-            local card_id = card_ids[i]
-            return cards[card_id]
+            local card = cards[i]
+            io.write("WARN CARD read", json.encode(card), "\n")
+            return { card }
         end
     end
 end
 
 function myAnki:show_card(card_info, question_answer, on_done)
+    logger.dbg("WARN card_info is", card_info, "\n")
     local signal = question_answer
     local function review_card(card_id, ease)
         AnkiConnect:review_card(card_id, ease)
@@ -111,6 +116,7 @@ function myAnki:deckView(deck, deck_name)
             local deck_iter = myAnki:deck_cards_iterator2(name)
             local function show_next_card()
                 local card = deck_iter()
+                logger.dbg("NEXT ITER CARD", card)
                 if not card then
                     UIManager:show(InfoMessage:new({
                         text = _("Deck finished"),
