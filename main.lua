@@ -25,14 +25,15 @@ os.setlocale("C", "numeric")
 
 io.write([[ WARN myAnki[*] Current time: ]], os.date("%x-%X"), "\n")
 
+local ankiconnect = AnkiConnect:new()
+
+local function catch_write(e)
+    print("ERROR:", e)
+end
+
 local myAnki = WidgetContainer:extend({
     name = "anki_rev",
 })
-
-function myAnki:get_cards(deck)
-    local card_ids = AnkiConnect:query_from_deck(deck)
-    return card_ids
-end
 
 function myAnki:deck_cards_iterator(deck)
     local card_ids = myAnki:get_cards(deck)
@@ -42,16 +43,32 @@ function myAnki:deck_cards_iterator(deck)
         i = i + 1
         if i <= n then
             local card_id = card_ids[i]
-            return AnkiConnect:read_card_from_id(card_id)
+            return ankiconnect:read_card_from_id(card_id)
         end
     end
 end
 
 function myAnki:deck_cards_iterator2(deck)
-    local card_ids = myAnki:get_cards(deck)
-    local cards = AnkiConnect:read_cards(card_ids)
+    local card_ids = ankiconnect:get_cards(deck)
+
+    xpcall(function()
+        card_ids = ankiconnect:get_cards(deck)
+    end, catch_write)
+
+    local cards = {}
+    local nil_cards = {}
+
+    xpcall(function()
+        nil_cards = ankiconnect:read_cards(card_ids)
+        logger.dbg("READ_CARDS", nil_cards)
+        assert(nil_cards ~= nil, "Did not get card info")
+    end, catch_write)
+    if nil_cards ~= nil then
+        cards = nil_cards
+    end
+
     local i = 0
-    local n = #card_ids
+    local n = #cards
 
     io.write("WARN deck_len, ", n, "\n")
     return function()
@@ -68,12 +85,12 @@ function myAnki:show_card(card_info, question_answer, on_done)
     logger.dbg("WARN card_info is", card_info, "\n")
     local signal = question_answer
     local function review_card(card_id, ease)
-        AnkiConnect:review_card(card_id, ease)
+        ankiconnect:review_card(card_id, ease)
     end
     local function on_save_cb()
         local m = self.card_menu
         -- self.current_note:set_custom_context(m.prev_s_cnt, m.prev_c_cnt, m.next_s_cnt, m.next_c_cnt)
-        -- AnkiConnect:add_note(self.current_note)
+        -- ankiconnect:add_note(self.current_note)
         self.card_menu:onClose()
     end
 
@@ -159,16 +176,13 @@ function myAnki:KeyValuePage(title, messageTable)
     })
     UIManager:show(kv)
 end
-local function catch_write(e)
-    print("ERROR:", e)
-end
 
 local function deck_load_helper()
-    local decks = AnkiConnect:get_decks()
+    local decks = ankiconnect:get_decks()
     local result = {}
 
     xpcall(function()
-        decks = AnkiConnect:get_decks()
+        decks = ankiconnect:get_decks()
     end, catch_write)
 
     for name, id in pairs(decks) do
@@ -176,7 +190,7 @@ local function deck_load_helper()
             text = name,
             name,
             callback = function()
-                local stats = AnkiConnect:get_stats_from(name)
+                local stats = ankiconnect:get_stats_from(name)
                 local deck = stats[tostring(id)]
                 UIManager:show(myAnki:deckView(deck, name))
             end,
@@ -289,7 +303,7 @@ function myAnki:get_sub_menu_items()
             keep_menu_open = true,
             callback = function()
                 return NetworkMgr:runWhenOnline(function()
-                    return AnkiConnect:sync()
+                    return ankiconnect:sync()
                 end)
             end,
         },
@@ -298,7 +312,7 @@ function myAnki:get_sub_menu_items()
             text = _("Set Anki Endpoint"),
             keep_menu_open = true,
             callback = function()
-                return AnkiConnect:sync()
+                return ankiconnect:sync()
             end,
         },
     }

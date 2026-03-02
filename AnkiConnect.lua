@@ -13,6 +13,17 @@ os.setlocale("C", "numeric")
 
 local AnkiConnect = {}
 
+function AnkiConnect:new(endpoint)
+    local obj = {
+        endpoint = endpoint or "http://192.168.100.109:8765",
+    }
+
+    setmetatable(obj, self)
+    self.__index = self
+
+    return obj
+end
+
 local endpoint = "http://192.168.100.109:8765"
 -- "http://192.168.100.109:8765"
 function AnkiConnect:init()
@@ -76,12 +87,12 @@ end
 
 function AnkiConnect:get_decks()
     local anki_connect_request = { action = "deckNamesAndIds", version = 6 }
-    return self:POST({ payload = anki_connect_request, url = endpoint })
+    return self:POST({ payload = anki_connect_request, url = self.endpoint })
 end
 
 function AnkiConnect:sync()
     local anki_connect_request = { action = "sync", version = 6 }
-    return self:POST({ payload = anki_connect_request, url = endpoint })
+    return self:POST({ payload = anki_connect_request, url = self.endpoint })
 end
 
 function AnkiConnect:get_stats(decks)
@@ -90,7 +101,7 @@ function AnkiConnect:get_stats(decks)
         deck_names = deck_names .. decks[i]
     end
     local body, code, headers, status =
-        http.request(endpoint, '{ "action": "getDeckStats", "version": 6, "params":{ "decks"=[' .. "]} }")
+        http.request(self.endpoint, '{ "action": "getDeckStats", "version": 6, "params":{ "decks"=[' .. "]} }")
 
     assert(body ~= nil, "Did not get deck info")
     -- io.write("WARN DECK", body)
@@ -99,14 +110,14 @@ end
 
 function AnkiConnect:get_deck_id(deck_name)
     local action = '{ "action": "deckNamesAndIds", "version": 6 }'
-    local body, code, headers, status = http.request(endpoint, action)
+    local body, code, headers, status = http.request(self.endpoint, action)
     return json.decode(body).result[deck_name]
 end
 
 function AnkiConnect:get_stats_from(deck)
     local deck_names = '"' .. deck .. '"'
     local action = '{ "action": "getDeckStats", "version": 6, "params":{ "decks":[' .. deck_names .. "]} }"
-    local body, code, headers, status = http.request(endpoint, action)
+    local body, code, headers, status = http.request(self.endpoint, action)
     if body == nil then
         error()
     end
@@ -115,18 +126,18 @@ function AnkiConnect:get_stats_from(deck)
 end
 
 function AnkiConnect:query_from_deck(deck)
-    local query = '"deck:\\"' .. deck .. '\\""'
-    local action = [[
-    {"action": "findCards",
-    "version": 6,
-    "params": {
-        "query": ]] .. query .. [[
-        }
+    local request = {
+        action = "findCards",
+        version = 6,
+        params = {
+            query = 'deck:"' .. deck .. '"',
+        },
     }
-    ]]
 
-    local body, code, headers, status = http.request(endpoint, action)
-    return json.decode(body).result
+    return self:POST({
+        payload = request,
+        url = self.endpoint,
+    })
 end
 
 function AnkiConnect:review_card(card_id, ease)
@@ -146,7 +157,7 @@ function AnkiConnect:review_card(card_id, ease)
     ]]
     io.write("WARN review, ", action, "\n")
 
-    local body, code, headers, status = http.request(endpoint, action)
+    local body, code, headers, status = http.request(self.endpoint, action)
     -- io.write("WARN card_response, ", body, "\n")
 
     return json.decode(body).result
@@ -162,13 +173,27 @@ function AnkiConnect:read_card_from_id(card_id)
         }
     }]]
 
-    local body, code, headers, status = http.request(endpoint, action)
+    local body, code, headers, status = http.request(self.endpoint, action)
     return json.decode(body).result
 end
 
+function AnkiConnect:get_cards(deck)
+    local card_ids = self:query_from_deck(deck)
+    return card_ids
+end
+
 function AnkiConnect:read_cards(cards)
-    local anki_connect_request = { action = "cardsInfo", params = { cards = cards }, version = 6 }
-    return self:POST({ payload = anki_connect_request, url = endpoint })
+    if type(cards) ~= "table" then
+        cards = { cards }
+    end
+    local request = {
+        action = "cardsInfo",
+        version = 6,
+        params = {
+            cards = cards,
+        },
+    }
+    return self:POST({ payload = request, url = self.endpoint })
 end
 
 return AnkiConnect
